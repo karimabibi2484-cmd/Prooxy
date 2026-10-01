@@ -8,15 +8,17 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        content="width=device-width,
+                 initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no"
     >
 
-    <title>Quick Barcode Scanner</title>
+    <title>High Quality Barcode Scanner</title>
 
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- ZXing -->
+    <!-- ZXing fallback -->
     <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
 
     <style>
@@ -28,35 +30,55 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
+            background: #eef4ff;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 300px;
         }
 
         video {
             width: 100%;
             height: 100%;
+            min-height: 300px;
+
             object-fit: cover;
+
             display: block;
+
+            background: #000;
         }
 
-        .scan-box {
+        /*
+            Barcode scanning area
+        */
+
+        .scan-frame {
 
             position: absolute;
-
-            width: 82%;
-            max-width: 340px;
-
-            height: 130px;
 
             left: 50%;
             top: 50%;
 
             transform: translate(-50%, -50%);
 
+            width: 90%;
+            max-width: 420px;
+
+            height: 150px;
+
             border: 3px solid #22c55e;
 
             border-radius: 12px;
 
             box-shadow:
-                0 0 0 9999px rgba(0, 0, 0, 0.40);
+                0 0 0 9999px
+                rgba(0, 0, 0, 0.38);
 
             pointer-events: none;
 
@@ -67,35 +89,108 @@
 
             position: absolute;
 
+            left: 0;
+
             width: 100%;
-            height: 2px;
+
+            height: 3px;
 
             background: #22c55e;
 
-            top: 50%;
+            box-shadow:
+                0 0 8px #22c55e;
 
             animation:
-                scanAnimation 1.5s linear infinite;
+                scanLine 1.6s linear infinite;
         }
 
-        @keyframes scanAnimation {
+        @keyframes scanLine {
 
             0% {
-                transform: translateY(-60px);
+                top: 0%;
             }
 
             50% {
-                transform: translateY(60px);
+                top: 100%;
             }
 
             100% {
-                transform: translateY(-60px);
+                top: 0%;
             }
 
         }
 
-        .hidden {
-            display: none !important;
+        .corner {
+
+            position: absolute;
+
+            width: 24px;
+            height: 24px;
+
+            border-color: #ffffff;
+
+        }
+
+        .top-left {
+
+            top: -2px;
+            left: -2px;
+
+            border-top: 4px solid;
+            border-left: 4px solid;
+
+        }
+
+        .top-right {
+
+            top: -2px;
+            right: -2px;
+
+            border-top: 4px solid;
+            border-right: 4px solid;
+
+        }
+
+        .bottom-left {
+
+            bottom: -2px;
+            left: -2px;
+
+            border-bottom: 4px solid;
+            border-left: 4px solid;
+
+        }
+
+        .bottom-right {
+
+            bottom: -2px;
+            right: -2px;
+
+            border-bottom: 4px solid;
+            border-right: 4px solid;
+
+        }
+
+        .success {
+
+            animation:
+                successAnimation 0.4s ease;
+        }
+
+        @keyframes successAnimation {
+
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.03);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+
         }
 
     </style>
@@ -103,75 +198,129 @@
 </head>
 
 
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+<body>
 
 
 <div class="min-h-screen flex items-center justify-center p-4">
 
-
     <div
-        class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden"
+        class="w-full max-w-lg bg-white
+               rounded-2xl shadow-xl overflow-hidden"
     >
-
 
         <!-- HEADER -->
 
-        <div class="bg-blue-600 p-6 text-center">
+        <div
+            class="bg-blue-600
+                   px-6 py-6 text-center"
+        >
 
-            <h1 class="text-2xl font-bold text-white">
-                Quick Barcode Scanner
+            <h1
+                class="text-2xl font-bold text-white"
+            >
+                High Quality Barcode Scanner
             </h1>
 
-            <p class="text-blue-100 text-sm mt-1">
-                Scan ID to record attendance
+            <p
+                class="text-blue-100 mt-1 text-sm"
+            >
+                Use your rear camera for best results
             </p>
 
         </div>
 
-
-        <!-- CONTENT -->
 
         <div class="p-5">
 
 
             <!-- CAMERA -->
 
-            <div
-                class="relative bg-black rounded-xl overflow-hidden"
-                style="aspect-ratio: 16 / 10;"
-            >
+            <div class="camera-container">
 
                 <video
                     id="video"
                     autoplay
-                    playsinline
                     muted
+                    playsinline
                 ></video>
 
 
-                <!-- Scan Box -->
+                <!-- SCAN FRAME -->
 
                 <div
-                    id="scanBox"
-                    class="scan-box hidden"
+                    id="scanFrame"
+                    class="scan-frame hidden"
                 >
 
                     <div class="scan-line"></div>
 
+                    <div
+                        class="corner top-left"
+                    ></div>
+
+                    <div
+                        class="corner top-right"
+                    ></div>
+
+                    <div
+                        class="corner bottom-left"
+                    ></div>
+
+                    <div
+                        class="corner bottom-right"
+                    ></div>
+
                 </div>
 
 
-                <!-- Camera Message -->
+                <!-- CAMERA MESSAGE -->
 
                 <div
                     id="cameraMessage"
-                    class="absolute inset-0 flex items-center justify-center
-                           text-white text-center px-5"
+                    class="absolute inset-0
+                           flex items-center
+                           justify-center
+                           text-white
+                           text-center
+                           px-6"
                 >
 
-                    Tap "Start Scanner"
-                    to activate camera
+                    Tap Start Scanner
 
+                </div>
+
+            </div>
+
+
+            <!-- CAMERA INFORMATION -->
+
+            <div
+                id="cameraInfo"
+                class="hidden mt-3
+                       bg-gray-50
+                       rounded-lg p-3
+                       text-xs text-gray-600"
+            >
+
+                <div>
+                    Resolution:
+                    <b id="resolution">
+                        -
+                    </b>
+                </div>
+
+                <div class="mt-1">
+                    Camera:
+                    <b id="cameraName">
+                        Rear camera
+                    </b>
+                </div>
+
+                <div class="mt-1">
+                    Focus:
+                    <b id="focusInfo">
+                        -
+                    </b>
                 </div>
 
             </div>
@@ -179,21 +328,28 @@
 
             <!-- STATUS -->
 
-            <div class="flex justify-center mt-4">
+            <div
+                class="flex justify-center mt-4"
+            >
 
                 <div
-                    id="status"
-                    class="flex items-center text-gray-600"
+                    class="flex items-center"
                 >
 
                     <span
                         id="statusDot"
-                        class="w-3 h-3 bg-gray-400
-                               rounded-full mr-2"
+                        class="w-3 h-3
+                               rounded-full
+                               bg-gray-400
+                               mr-2"
                     ></span>
 
-                    <span id="statusText">
-                        Camera is off
+                    <span
+                        id="statusText"
+                        class="text-sm
+                               text-gray-600"
+                    >
+                        Camera off
                     </span>
 
                 </div>
@@ -201,15 +357,17 @@
             </div>
 
 
-            <!-- START BUTTON -->
+            <!-- START -->
 
             <button
                 id="startButton"
                 type="button"
-                class="w-full mt-5 bg-blue-600
-                       hover:bg-blue-700 active:bg-blue-800
-                       text-white font-semibold
-                       py-3 rounded-xl transition"
+                class="w-full mt-5
+                       bg-blue-600
+                       hover:bg-blue-700
+                       text-white
+                       font-semibold
+                       py-3 rounded-xl"
             >
 
                 📷 Start Scanner
@@ -217,14 +375,16 @@
             </button>
 
 
-            <!-- STOP BUTTON -->
+            <!-- STOP -->
 
             <button
                 id="stopButton"
                 type="button"
                 class="hidden w-full mt-3
-                       bg-gray-200 hover:bg-gray-300
-                       text-gray-700 font-semibold
+                       bg-gray-200
+                       hover:bg-gray-300
+                       text-gray-700
+                       font-semibold
                        py-3 rounded-xl"
             >
 
@@ -246,22 +406,20 @@
                            rounded-xl p-4"
                 >
 
-                    <div class="flex items-center">
+                    <div
+                        class="flex items-center"
+                    >
 
                         <div
-                            class="w-9 h-9
+                            class="w-10 h-10
                                    bg-green-500
                                    rounded-full
                                    flex items-center
                                    justify-center
-                                   text-white
-                                   text-lg"
+                                   text-white text-xl"
                         >
-
                             ✓
-
                         </div>
-
 
                         <div class="ml-3">
 
@@ -269,18 +427,14 @@
                                 class="font-semibold
                                        text-green-800"
                             >
-
                                 Barcode Scanned
-
                             </p>
 
                             <p
                                 class="text-xs
                                        text-green-600"
                             >
-
                                 Data stored successfully
-
                             </p>
 
                         </div>
@@ -288,15 +442,15 @@
                     </div>
 
 
-                    <!-- Barcode Data -->
-
                     <div
                         id="result"
-                        class="mt-3 bg-white
-                               rounded-lg p-3
-                               text-sm font-mono
-                               break-all
-                               text-gray-800"
+                        class="mt-3
+                               bg-white
+                               rounded-lg
+                               p-3
+                               font-mono
+                               text-sm
+                               break-all"
                     ></div>
 
                 </div>
@@ -304,15 +458,20 @@
             </div>
 
 
-            <!-- STORAGE COUNT -->
+            <!-- COUNT -->
 
             <div
-                class="mt-5 bg-gray-50
-                       rounded-xl p-4 text-center"
+                class="mt-5
+                       bg-gray-50
+                       rounded-xl
+                       p-4 text-center"
             >
 
-                <p class="text-xs text-gray-500">
-                    Total Stored Scans
+                <p
+                    class="text-xs
+                           text-gray-500"
+                >
+                    Stored Scans
                 </p>
 
                 <p
@@ -331,10 +490,8 @@
 
             <button
                 id="clearButton"
-                type="button"
                 class="w-full mt-3
-                       text-sm text-red-500
-                       hover:text-red-700"
+                       text-sm text-red-500"
             >
 
                 Clear Stored Data
@@ -342,26 +499,8 @@
             </button>
 
 
-            <!-- HTTPS WARNING -->
-
-            <div
-                id="secureWarning"
-                class="hidden mt-4
-                       bg-yellow-50
-                       border border-yellow-200
-                       rounded-lg p-3
-                       text-xs text-yellow-800"
-            >
-
-                Camera access requires HTTPS on mobile.
-                Open this website using an HTTPS URL.
-
-            </div>
-
         </div>
 
-
-        <!-- FOOTER -->
 
         <div
             class="bg-gray-50
@@ -370,10 +509,11 @@
 
             <p
                 class="text-center
-                       text-xs text-gray-500"
+                       text-xs
+                       text-gray-500"
             >
 
-                Place your barcode inside the green box
+                Keep the barcode inside the green frame
 
             </p>
 
@@ -401,11 +541,23 @@ const startButton =
 const stopButton =
     document.getElementById("stopButton");
 
-const scanBox =
-    document.getElementById("scanBox");
+const scanFrame =
+    document.getElementById("scanFrame");
 
 const cameraMessage =
     document.getElementById("cameraMessage");
+
+const cameraInfo =
+    document.getElementById("cameraInfo");
+
+const resolution =
+    document.getElementById("resolution");
+
+const cameraName =
+    document.getElementById("cameraName");
+
+const focusInfo =
+    document.getElementById("focusInfo");
 
 const statusText =
     document.getElementById("statusText");
@@ -425,9 +577,6 @@ const scanCount =
 const clearButton =
     document.getElementById("clearButton");
 
-const secureWarning =
-    document.getElementById("secureWarning");
-
 
 /* =========================================================
    VARIABLES
@@ -439,76 +588,61 @@ let scanning = false;
 
 let scanTimer = null;
 
-let barcodeReader = null;
+let barcodeDetector = null;
+
+let zxingReader = null;
 
 let lastScannedCode = null;
 
-
-/* =========================================================
-   CHECK CAMERA SUPPORT
-========================================================= */
-
-function checkCameraSupport() {
-
-    if (!navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia) {
-
-        setStatus(
-            "Camera is not supported",
-            "error"
-        );
-
-        startButton.disabled = true;
-
-        return false;
-    }
-
-    return true;
-}
+let useNativeDetector = false;
 
 
 /* =========================================================
-   CHECK HTTPS
+   BARCODE FORMATS
 ========================================================= */
 
-function checkSecureContext() {
+const barcodeFormats = [
 
-    /*
-       localhost is considered secure by browsers.
+    "aztec",
 
-       HTTPS is required when accessing
-       the website from an actual phone.
-    */
+    "code_128",
 
-    const isLocalhost =
-        location.hostname === "localhost" ||
-        location.hostname === "127.0.0.1";
+    "code_39",
 
-    if (!window.isSecureContext && !isLocalhost) {
+    "code_93",
 
-        secureWarning.classList.remove(
-            "hidden"
-        );
+    "codabar",
 
-        setStatus(
-            "HTTPS required for camera",
-            "error"
-        );
+    "data_matrix",
 
-        return false;
-    }
+    "ean_13",
 
-    return true;
-}
+    "ean_8",
+
+    "itf",
+
+    "pdf417",
+
+    "qr_code",
+
+    "upc_a",
+
+    "upc_e"
+
+];
 
 
 /* =========================================================
    STATUS
 ========================================================= */
 
-function setStatus(message, type = "normal") {
+function setStatus(
+    message,
+    type = "normal"
+) {
 
-    statusText.textContent = message;
+    statusText.textContent =
+        message;
 
 
     if (type === "scanning") {
@@ -532,7 +666,7 @@ function setStatus(message, type = "normal") {
 
     }
 
-    else if (type === "waiting") {
+    else if (type === "warning") {
 
         statusDot.className =
             "w-3 h-3 bg-yellow-500 rounded-full mr-2";
@@ -543,13 +677,14 @@ function setStatus(message, type = "normal") {
 
         statusDot.className =
             "w-3 h-3 bg-gray-400 rounded-full mr-2";
+
     }
 
 }
 
 
 /* =========================================================
-   LOCAL STORAGE
+   STORAGE
 ========================================================= */
 
 function getStoredData() {
@@ -562,7 +697,7 @@ function getStoredData() {
             ) || "[]"
         );
 
-    } catch (error) {
+    } catch {
 
         return [];
 
@@ -571,18 +706,13 @@ function getStoredData() {
 }
 
 
-/*
-   Save ONLY the barcode information
-   together with timestamp.
-*/
-
 function saveBarcodeData(data) {
 
-    const existingData =
+    const stored =
         getStoredData();
 
 
-    existingData.push({
+    stored.push({
 
         barcodeData: data,
 
@@ -594,7 +724,7 @@ function saveBarcodeData(data) {
 
     localStorage.setItem(
         "barcodeData",
-        JSON.stringify(existingData)
+        JSON.stringify(stored)
     );
 
 
@@ -603,17 +733,156 @@ function saveBarcodeData(data) {
 }
 
 
-/* =========================================================
-   UPDATE COUNT
-========================================================= */
-
 function updateCount() {
 
-    const data =
-        getStoredData();
-
     scanCount.textContent =
-        data.length;
+        getStoredData().length;
+
+}
+
+
+/* =========================================================
+   CAMERA CAPABILITIES
+========================================================= */
+
+async function optimizeCamera() {
+
+    if (!stream) {
+        return;
+    }
+
+
+    const track =
+        stream.getVideoTracks()[0];
+
+
+    if (!track) {
+        return;
+    }
+
+
+    const capabilities =
+        track.getCapabilities();
+
+
+    const settings =
+        track.getSettings();
+
+
+    /*
+       Display actual resolution
+    */
+
+    resolution.textContent =
+        `${settings.width || "-"} × ${settings.height || "-"}`;
+
+
+    /*
+       Continuous autofocus
+    */
+
+    if (
+        capabilities.focusMode &&
+        capabilities.focusMode.includes(
+            "continuous"
+        )
+    ) {
+
+        try {
+
+            await track.applyConstraints({
+
+                advanced: [
+
+                    {
+                        focusMode:
+                            "continuous"
+                    }
+
+                ]
+
+            });
+
+            focusInfo.textContent =
+                "Continuous autofocus";
+
+        } catch {
+
+            focusInfo.textContent =
+                "Automatic";
+
+        }
+
+    }
+
+    else {
+
+        focusInfo.textContent =
+            "Automatic";
+
+    }
+
+
+    /*
+       Try to enable maximum useful zoom
+       only when supported.
+
+       We deliberately do NOT force
+       maximum zoom because excessive
+       digital zoom can make a barcode
+       harder to decode.
+    */
+
+    if (
+        capabilities.zoom &&
+        capabilities.zoom.min !== undefined
+    ) {
+
+        try {
+
+            /*
+               Use a modest zoom.
+
+               The exact value depends
+               on the phone.
+            */
+
+            const minZoom =
+                capabilities.zoom.min;
+
+            const maxZoom =
+                capabilities.zoom.max;
+
+            const targetZoom =
+                Math.min(
+                    maxZoom,
+                    Math.max(
+                        minZoom,
+                        1.5
+                    )
+                );
+
+
+            await track.applyConstraints({
+
+                advanced: [
+
+                    {
+                        zoom:
+                            targetZoom
+                    }
+
+                ]
+
+            });
+
+        } catch {
+
+            // Zoom not supported.
+
+        }
+
+    }
 
 }
 
@@ -624,114 +893,166 @@ function updateCount() {
 
 async function startCamera() {
 
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
 
-    /*
-       Check HTTPS first.
-    */
+        setStatus(
+            "Camera not supported",
+            "error"
+        );
 
-    if (!checkSecureContext()) {
         return;
+
     }
 
 
-    /*
-       Check browser camera support.
-    */
+    if (!window.isSecureContext) {
 
-    if (!checkCameraSupport()) {
+        setStatus(
+            "HTTPS is required",
+            "error"
+        );
+
+        cameraMessage.textContent =
+            "Open this website using HTTPS.";
+
         return;
+
     }
 
 
     try {
 
         setStatus(
-            "Requesting camera permission...",
-            "waiting"
+            "Requesting camera...",
+            "warning"
         );
 
 
         /*
-           IMPORTANT:
+           HIGH QUALITY CAMERA REQUEST
 
-           getUserMedia() is called directly
-           from the Start button action.
+           We request 4K first.
 
-           This is important for mobile browsers.
+           If the device/browser cannot provide
+           it, the browser will negotiate a
+           suitable resolution.
         */
 
-        stream =
-            await navigator.mediaDevices.getUserMedia({
+        const constraints = {
 
-                audio: false,
+            audio: false,
 
-                video: {
+            video: {
 
-                    /*
-                       Rear camera
-                    */
+                facingMode: {
+                    ideal: "environment"
+                },
 
-                    facingMode: {
-                        ideal: "environment"
-                    },
+                width: {
+                    min: 1280,
+                    ideal: 1920,
+                    max: 3840
+                },
 
-                    /*
-                       Good balance between
-                       speed and barcode quality.
-                    */
+                height: {
+                    min: 720,
+                    ideal: 1080,
+                    max: 2160
+                },
 
-                    width: {
-                        ideal: 1280
-                    },
-
-                    height: {
-                        ideal: 720
-                    }
-
+                frameRate: {
+                    ideal: 30,
+                    max: 60
                 }
-
-            });
-
-
-        /*
-           Give stream to video.
-        */
-
-        video.srcObject = stream;
-
-
-        /*
-           Wait until camera actually starts.
-        */
-
-        await new Promise((resolve) => {
-
-            if (video.readyState >= 2) {
-
-                resolve();
-
-            } else {
-
-                video.onloadedmetadata =
-                    () => resolve();
 
             }
 
-        });
+        };
+
+
+        stream =
+            await navigator.mediaDevices
+                .getUserMedia(
+                    constraints
+                );
+
+
+        video.srcObject =
+            stream;
+
+
+        /*
+           Wait for camera metadata.
+        */
+
+        await new Promise(
+            resolve => {
+
+                if (
+                    video.readyState >= 2
+                ) {
+
+                    resolve();
+
+                }
+
+                else {
+
+                    video.onloadedmetadata =
+                        resolve;
+
+                }
+
+            }
+        );
 
 
         await video.play();
 
 
         /*
-           Camera is ready.
+           Optimize actual camera.
+        */
+
+        await optimizeCamera();
+
+
+        /*
+           Display actual settings.
+        */
+
+        const track =
+            stream.getVideoTracks()[0];
+
+        const settings =
+            track.getSettings();
+
+
+        resolution.textContent =
+            `${settings.width} × ${settings.height}`;
+
+
+        cameraName.textContent =
+            track.label ||
+            "Rear camera";
+
+
+        /*
+           Camera UI
         */
 
         cameraMessage.classList.add(
             "hidden"
         );
 
-        scanBox.classList.remove(
+        scanFrame.classList.remove(
+            "hidden"
+        );
+
+        cameraInfo.classList.remove(
             "hidden"
         );
 
@@ -751,24 +1072,20 @@ async function startCamera() {
 
 
         /*
-           Create ZXing reader.
+           Setup decoder.
         */
 
-        barcodeReader =
-            new ZXing.BrowserMultiFormatReader();
+        setupDecoder();
 
 
         scanning = true;
 
 
-        /*
-           Start scanning loop.
-        */
+        scanFrameLoop();
 
-        scanFrame();
+    }
 
-
-    } catch (error) {
+    catch (error) {
 
         console.error(
             "Camera error:",
@@ -786,117 +1103,135 @@ async function startCamera() {
 
 
 /* =========================================================
-   CAMERA ERROR
+   DECODER SETUP
 ========================================================= */
 
-function handleCameraError(error) {
+function setupDecoder() {
 
-    stopCamera();
+    /*
+       Prefer native BarcodeDetector
+       when available.
+    */
+
+    if (
+        "BarcodeDetector" in window
+    ) {
+
+        try {
+
+            barcodeDetector =
+                new BarcodeDetector({
+
+                    formats:
+                        barcodeFormats
+
+                });
 
 
-    if (error.name === "NotAllowedError") {
+            useNativeDetector =
+                true;
 
-        setStatus(
-            "Camera permission denied",
-            "error"
-        );
 
-        cameraMessage.textContent =
-            "Camera permission was denied. Allow camera access in browser settings.";
+            console.log(
+                "Using native BarcodeDetector"
+            );
 
-    }
 
-    else if (error.name === "NotFoundError") {
+            return;
 
-        setStatus(
-            "No camera found",
-            "error"
-        );
+        }
 
-        cameraMessage.textContent =
-            "No camera was found on this device.";
+        catch {
 
-    }
+            useNativeDetector =
+                false;
 
-    else if (error.name === "NotReadableError") {
-
-        setStatus(
-            "Camera is already in use",
-            "error"
-        );
-
-        cameraMessage.textContent =
-            "Another application may be using the camera.";
-
-    }
-
-    else if (error.name === "SecurityError") {
-
-        setStatus(
-            "Camera blocked by browser",
-            "error"
-        );
-
-        cameraMessage.textContent =
-            "Camera access is blocked. Use HTTPS and allow camera permission.";
-
-    }
-
-    else {
-
-        setStatus(
-            "Unable to access camera",
-            "error"
-        );
-
-        cameraMessage.textContent =
-            "Unable to access camera.";
+        }
 
     }
 
 
-    cameraMessage.classList.remove(
-        "hidden"
+    /*
+       Fallback to ZXing.
+    */
+
+    useNativeDetector =
+        false;
+
+    zxingReader =
+        new ZXing.BrowserMultiFormatReader();
+
+
+    console.log(
+        "Using ZXing fallback"
     );
 
 }
 
 
 /* =========================================================
-   SCAN FRAME
+   NATIVE BARCODE DETECTION
 ========================================================= */
 
-async function scanFrame() {
+async function detectNative() {
 
-    if (!scanning) {
-        return;
+    if (!barcodeDetector) {
+        return null;
+    }
+
+
+    try {
+
+        const detected =
+            await barcodeDetector.detect(
+                video
+            );
+
+
+        if (
+            detected &&
+            detected.length > 0
+        ) {
+
+            return detected[0].rawValue;
+
+        }
+
+    }
+
+    catch {
+
+        // Nothing detected.
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   ZXING DETECTION
+========================================================= */
+
+async function detectZXing() {
+
+    if (!zxingReader) {
+        return null;
     }
 
 
     try {
 
         /*
-           ZXing reads the current
-           camera frame.
+           Decode directly from video.
 
-           Supported examples:
-
-           QR_CODE
-           CODE_128
-           CODE_39
-           CODE_93
-           EAN_8
-           EAN_13
-           UPC_A
-           UPC_E
-           ITF
-           CODABAR
-           RSS_14
-           etc.
+           ZXing handles the image processing.
         */
 
         const scanResult =
-            await barcodeReader
+            await zxingReader
                 .decodeFromVideoElement(
                     video
                 );
@@ -904,47 +1239,92 @@ async function scanFrame() {
 
         if (scanResult) {
 
-            const barcode =
-                scanResult.getText();
-
-
-            if (barcode) {
-
-                handleBarcode(
-                    barcode
-                );
-
-                return;
-
-            }
+            return scanResult.getText();
 
         }
 
-    } catch (error) {
+    }
 
-        /*
-           ZXing throws an exception
-           when nothing is detected.
+    catch {
 
-           This is NORMAL.
+        // No barcode found.
 
-           Therefore we don't show an error.
-        */
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   SCANNING LOOP
+========================================================= */
+
+async function scanFrameLoop() {
+
+    if (!scanning) {
+        return;
+    }
+
+
+    let barcode = null;
+
+
+    /*
+       First try native detector.
+    */
+
+    if (useNativeDetector) {
+
+        barcode =
+            await detectNative();
 
     }
 
 
     /*
-       Scan again after 100 ms.
+       If native detection didn't
+       find anything, use ZXing.
 
-       Approximately 10 attempts/sec.
+       This makes detection more
+       tolerant across devices.
+    */
+
+    if (!barcode && !useNativeDetector) {
+
+        barcode =
+            await detectZXing();
+
+    }
+
+
+    /*
+       BARCODE FOUND
+    */
+
+    if (barcode) {
+
+        handleBarcode(
+            barcode
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Scan again.
+
+       100 ms ≈ 10 attempts/sec.
     */
 
     if (scanning) {
 
         scanTimer =
             setTimeout(
-                scanFrame,
+                scanFrameLoop,
                 100
             );
 
@@ -965,12 +1345,15 @@ function handleBarcode(data) {
 
 
     /*
-       Prevent immediate duplicate
-       processing.
+       Prevent immediate duplicate.
     */
 
-    if (data === lastScannedCode) {
+    if (
+        data === lastScannedCode
+    ) {
+
         return;
+
     }
 
 
@@ -979,7 +1362,7 @@ function handleBarcode(data) {
 
 
     /*
-       STORE BARCODE
+       STORE
     */
 
     saveBarcodeData(
@@ -988,23 +1371,25 @@ function handleBarcode(data) {
 
 
     /*
-       SHOW RESULT
+       SHOW
     */
 
     result.textContent =
         data;
+
 
     resultContainer.classList.remove(
         "hidden"
     );
 
 
-    /*
-       SUCCESS STATUS
-    */
+    resultContainer.classList.add(
+        "success"
+    );
+
 
     setStatus(
-        "Scan successful",
+        "Barcode scanned successfully",
         "success"
     );
 
@@ -1017,15 +1402,19 @@ function handleBarcode(data) {
 
 
     /*
-       Allow same barcode to be
-       scanned again later.
+       Allow same barcode again
+       after one second.
     */
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        lastScannedCode = null;
+            lastScannedCode =
+                null;
 
-    }, 1000);
+        },
+        1000
+    );
 
 }
 
@@ -1039,10 +1428,6 @@ function stopCamera() {
     scanning = false;
 
 
-    /*
-       Stop scan timer.
-    */
-
     if (scanTimer) {
 
         clearTimeout(
@@ -1055,7 +1440,24 @@ function stopCamera() {
 
 
     /*
-       Stop camera tracks.
+       Stop ZXing reader if possible.
+    */
+
+    if (zxingReader) {
+
+        try {
+
+            zxingReader.reset();
+
+        }
+
+        catch {}
+
+    }
+
+
+    /*
+       Stop camera.
     */
 
     if (stream) {
@@ -1071,18 +1473,14 @@ function stopCamera() {
     }
 
 
-    /*
-       Remove video stream.
-    */
-
     video.srcObject = null;
 
 
-    /*
-       UI
-    */
+    scanFrame.classList.add(
+        "hidden"
+    );
 
-    scanBox.classList.add(
+    cameraInfo.classList.add(
         "hidden"
     );
 
@@ -1094,36 +1492,21 @@ function stopCamera() {
         "hidden"
     );
 
-
-    startButton.disabled =
-        false;
-
 }
 
 
 /* =========================================================
-   START BUTTON
+   START
 ========================================================= */
 
 startButton.addEventListener(
     "click",
-    async () => {
-
-        /*
-           Important:
-
-           This click directly triggers
-           the camera permission request.
-        */
-
-        await startCamera();
-
-    }
+    startCamera
 );
 
 
 /* =========================================================
-   STOP BUTTON
+   STOP
 ========================================================= */
 
 stopButton.addEventListener(
@@ -1132,15 +1515,18 @@ stopButton.addEventListener(
 
         stopCamera();
 
-        setStatus(
-            "Camera stopped"
-        );
 
         cameraMessage.textContent =
-            'Tap "Start Scanner" to activate camera';
+            "Tap Start Scanner";
+
 
         cameraMessage.classList.remove(
             "hidden"
+        );
+
+
+        setStatus(
+            "Camera stopped"
         );
 
     }
@@ -1155,14 +1541,14 @@ clearButton.addEventListener(
     "click",
     () => {
 
-        const confirmed =
-            confirm(
+        if (
+            !confirm(
                 "Delete all stored barcode data?"
-            );
+            )
+        ) {
 
-
-        if (!confirmed) {
             return;
+
         }
 
 
@@ -1174,15 +1560,11 @@ clearButton.addEventListener(
         updateCount();
 
 
-        result.textContent = "";
+        result.textContent =
+            "";
 
         resultContainer.classList.add(
             "hidden"
-        );
-
-
-        setStatus(
-            "Stored data cleared"
         );
 
     }
@@ -1190,14 +1572,10 @@ clearButton.addEventListener(
 
 
 /* =========================================================
-   INITIALIZATION
+   INITIALIZE
 ========================================================= */
 
 updateCount();
-
-checkCameraSupport();
-
-checkSecureContext();
 
 
 </script>
@@ -1205,87 +1583,4 @@ checkSecureContext();
 </body>
 
 </html>
-```
-
-### ⚠️ Very important for your mobile test
-
-If you're opening the HTML like this:
-
-```text
-file:///storage/emulated/0/Download/index.html
-```
-
-the camera may **not be allowed**.
-
-For your actual phone, use something like:
-
-```text
-https://your-site.com
-```
-
-or deploy the file on a service that provides HTTPS.
-
-For development on your computer:
-
-```text
-http://localhost:3000
-```
-
-is generally okay.
-
-### What happens now
-
-When the student taps:
-
-**📷 Start Scanner**
-
-the browser immediately executes:
-
-```javascript
-navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: {
-        facingMode: {
-            ideal: "environment"
-        }
-    }
-});
-```
-
-So Android Chrome should display something similar to:
-
-> **Allow this site to use your camera?**
-> Allow / Don't allow
-
-After permission:
-
-```text
-Camera
-   ↓
-Rear camera
-   ↓
-ZXing
-   ↓
-QR / 1D barcode
-   ↓
-barcodeData
-   ↓
-localStorage
-   ↓
-Camera OFF
-```
-
-The stored data will look like:
-
-```json
-[
-    {
-        "barcodeData": "STUDENT12345",
-        "timestamp": "2026-10-01T09:15:32.000Z"
-    },
-    {
-        "barcodeData": "STUDENT67890",
-        "timestamp": "2026-10-01T09:15:41.000Z"
-    }
-]
 
